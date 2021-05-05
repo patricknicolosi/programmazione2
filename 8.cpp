@@ -3,6 +3,8 @@ Implementare una classe Array che simuli il comportamento di un array che conter
 solo interi.
 */
 
+//....
+
 
 #include <iostream>
 #include <limits.h>
