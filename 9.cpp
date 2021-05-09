@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <limits.h>
 #include <cstdlib>
 using namespace std;
 
@@ -22,7 +23,7 @@ class Veicolo{
         double prezzo;
     
     public:
-        int velocita; //Velocità istantanea
+        int velocita = 0; //Velocità istantanea
         int posizione; //La posizione attuale del veicolo
         Veicolo(int _velocitaMax, double _prezzo, string _marca, string _motorizzazione, string _carburante, int _numeroRuote):
         velocitaMax(_velocitaMax), prezzo(_prezzo), marca(_marca), motorizzazione(_motorizzazione), carburante(_carburante), numeroRuote(_numeroRuote){}
@@ -68,13 +69,13 @@ class Veicolo{
             this->prezzo = _prezzo;
             return;
         }
-        void accelera(int _velocita){
+        void accelera(){
             if(velocita <= velocitaMax){
                 this->velocita++;
             }
             return;
         }
-        void decelera(int _velocita){
+        void decelera(){
             if(velocita > 0){
                 this->velocita--;
             }
@@ -85,7 +86,17 @@ class Veicolo{
             stream << veicolo.toString(); //Per accedere a questa funzione dobbiamo dichiare const la funzione toString
             return stream;
         }
+        void operator=(const Veicolo& veicolo){
+            this->numeroRuote = veicolo.numeroRuote;
+            this->velocitaMax = veicolo.velocitaMax;
+            this->motorizzazione = veicolo.motorizzazione;
+            this->carburante = veicolo.carburante;
+            this->marca = veicolo.marca;
+            this->prezzo = veicolo.prezzo;
+        }
 };
+
+
 
 class Motociclo : public Veicolo{
     public: 
@@ -123,9 +134,10 @@ class Automobile : public Veicolo{
 };
 
 
-/*class Gara{
-    Veicolo *veicoli;
+class Gara{
+    Veicolo **veicoli; //Puntatore di puntatore a veicolo, questo perchè veicolo è una classe astratta
     int numeroPartecipanti;
+    int numeroIscritti;
     int durata;
     void controlla();
 
@@ -133,32 +145,43 @@ class Automobile : public Veicolo{
         Gara(int _durata, int _numeroPartecipanti){
             this->durata = _durata;
             this->numeroPartecipanti = _numeroPartecipanti;
-            veicoli = new Veicolo[numeroPartecipanti];
+            veicoli = new Veicolo*[numeroPartecipanti];
+            numeroIscritti = 0;
+        }
+        void aggiungiPartecipante(Veicolo& nuovoVeicolo){
+            *veicoli[numeroIscritti] = nuovoVeicolo;
+            numeroIscritti++;
+            return;
         }
         void partenza(){
             srand(42);
             for(int i=0; i<durata; i++){
-                for(int j=0; j<numeroPartecipanti; j++){
+                for(int j=0; j<numeroIscritti; j++){
                     int scelta = rand()%2;
                     if(scelta==1)
-                        veicoli[j].accelera();
+                        veicoli[j]->accelera();
                     else
-                        veicoli[j].decelera();
-                    aggiorna();
+                        veicoli[j]->decelera();
                 }
-                controlla();
+                controlla(i);
             }
             stampaClassifica();
         }
-        void aggiorna(){
-            return;
-        }
-        void controlla(){
+        void controlla(int istanteTempo /*utile nella formula per il calcolo dello spazio percorso*/){
+            int max = 0;
+            int indiceMax;
+            for(int i=0; i<numeroIscritti; i++){
+               if(veicoli[i]->velocita > max){
+                   max = veicoli[i]->velocita;
+                   indiceMax = i;
+               }
+            }
+            cout << "Il veicolo piu veloce: " << * veicoli[indiceMax] << endl;
             return;
         }
         void stampaClassifica(){
             cout << "[ ";
-            for(int i=0; i<numeroPartecipanti; i++) cout << veicoli[i].getMarca() << ", ";
+            for(int i=0; i<numeroIscritti; i++) cout << veicoli[i]->getMarca() << ", ";
             cout << " ]" << endl;
             return;
         }
@@ -179,12 +202,17 @@ class Automobile : public Veicolo{
         ~Gara(){ //Distruttore per svuotare la memoria dopo l'instaziamento di un oggeto
             delete [] veicoli; //Fortemente consigliato in questi casi (obbligatorio per il prof Moltisanti)
         }
-};*/
+};
 
 int main(){
-    Motociclo motociclo = Motociclo(30, 100.50, "Ducati", "1000cc");
+    Motociclo motociclo = Motociclo(50, 100.50, "Ducati", "1000cc");
     cout << motociclo << endl;
     Automobile automobile = Automobile(30, 100.50, "Scania", "1000cc", "Diesel");
     cout << automobile << endl;
+
+    Gara gara(10,10);
+    gara.aggiungiPartecipante(motociclo);
+    gara.aggiungiPartecipante(automobile);
+    gara.partenza();
     return 0;
 }
