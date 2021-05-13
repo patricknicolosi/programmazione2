@@ -1,40 +1,5 @@
-#include<iostream>
-#include <sstream>
-using namespace std;
+#include "node.hpp"
 
-template <class T>
-class Node{
-	T value; //contenuto di ogni nodo
-	Node<T>* next; //puntatore al prossimo nodo
-
-	public:
-		Node(T value, Node<T>* next) : value(value), next(next){}
-		Node(T value) : Node(value, NULL){}
-		Node() : Node(0, NULL){}
-
-		Node<T>* getNext(){ 
-			return this->next;
-		}
-		T getValue(){
-			return this->value;
-		}
-		void setNext(Node<T>* next){
-			this->next = next;
-			return;
-		}
-		void setValue(T value){
-			this->value = value;
-		}
-		string toString(){
-			stringstream ss;
-			ss << "Node value = " << value << ", next = " << next;
-			return ss.str();
-		}
-		friend ostream& operator<<(ostream& stream, Node<T> node){
-			stream << "Node value = " << node.getValue() << ", next = " << node.getNext();
-			return stream;
-		}
-};
 
 template <class T>
 class List{
@@ -68,12 +33,32 @@ class List{
 				return;
 			}
 		}
-		/*void remove(){
-
-		}*/
+		Node<T>* cancel(T value){
+			if(this->search(value)){ //se il valore è presente nella lista
+				if(head->getValue() == value){ //Se il valore è in testa
+					Node<T>* tmp = head;
+					head = head->getNext();
+					return tmp;
+				}
+				else{ //Se il valore non è in testa
+					Node<T>* prev = head;
+					Node<T>* current = head->getNext();
+					while(current != NULL){
+						if(current->getValue() == value){
+							prev->setNext(current->getNext());
+							return current;
+						}
+						prev = current;
+						current = current->getNext();
+					}
+				}
+			}
+			return NULL;
+		}
 		bool search(T value){
+			if(head == NULL) return false;
 			Node<T>* current = head;
-			while(current->getNext() != NULL){ 
+			while(current != NULL){ 
 				if(current->getValue() == value) return true;
 				current = current->getNext();
 			}
@@ -88,20 +73,3 @@ class List{
 			return stream;
 		}
 };
-
-int main(){
-	Node<int> n0 = Node<int>(10);
-	Node<int> n1 = Node<int>(15);
-	Node<int> n2 = Node<int>(20);
-
-	List<int> list;
-	list.add(&n0);
-	list.add(&n1);
-	list.add(&n2);
-	list.add(50);
-	cout << list << endl;
-
-	cout << list.search(50) << endl;
-
-	return 0;
-}
