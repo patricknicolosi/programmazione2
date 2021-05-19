@@ -2,17 +2,29 @@
 using namespace std;
 
 
-class Studente{
-    string nome;
-    string cognome;
+class Punto{
+    int x;
+    int y;
     
     public:
-        Studente(string nome, string cognome){
-            this->nome = nome;
-            this->cognome = cognome;
+        Punto(int x, int y){
+            this->x = x;
+            this->y = y;
         }
-        friend ostream& operator<< (ostream& stream, const Studente& studente){
-            stream << studente.nome << ", " << studente.cognome;
+        friend bool operator <= (const Punto& p1, const Punto& p2){
+            if(p1.x <= p2.x && p1.y <= p2.y) return true;
+            return false;
+        }
+        friend bool operator >= (const Punto& p1, const Punto& p2){
+            if(p1.x >= p2.x && p1.y >= p2.y) return true;
+            return false;
+        }
+        friend bool operator == (const Punto& p1, const Punto& p2){
+            if(p1.x == p2.x && p1.y == p2.y) return true;
+            return false;
+        }
+        friend ostream& operator<< (ostream& stream, const Punto& Punto){
+            stream << "(" << Punto.x << ";" << Punto.y << ")";
             return stream;
         }
 };
@@ -72,7 +84,72 @@ class List{
             length++;
             return;
         }
-        
+		void addInOrder(T value) {
+			Node<T> * newNode = new Node<T>(value);
+			if(head == NULL) {
+				add(newNode);
+				return;
+			}
+			if(head->getValue() > value){
+				newNode->setNext(head);
+				head = newNode;
+				length++;
+				return;
+			}
+			
+			Node<T> * prevNode = head;
+			Node<T>	* currentNode = head->getNext();
+
+			while(currentNode != NULL) {
+				if(prevNode->getValue() <= value && currentNode->getValue() > value) {
+					prevNode->setNext(newNode);
+					newNode->setNext(currentNode);
+					length++;
+					return;
+				}
+				else {
+					prevNode = currentNode; 
+					currentNode = currentNode->getNext();
+				}
+			}
+			prevNode->setNext(newNode);
+			length++;
+			return;
+		}
+
+        bool search(T value){
+            if(head == NULL) return false;
+            Node<T>* currentNode = head;
+            while(currentNode != NULL){
+            	if(currentNode->getValue() == value){
+            		return true;
+            	}
+            	currentNode = currentNode->getNext();
+            }
+            return false;
+        }
+        void remove(T value) {
+            if(this->search(value)){
+                if(head->getValue() == value) {
+                    Node<T> * temp = head;
+                    head = head->getNext();
+                    length--;
+                    return;
+                }   
+                Node<T> * prev = head;
+                Node<T> * currentNode = head->getNext();
+                while(currentNode != NULL){
+                    if(currentNode->getValue() == value){
+                        prev->setNext(currentNode->getNext());
+                        length--;
+                        return;
+                    }
+                    prev = currentNode;
+                    currentNode = currentNode->getNext();
+                }
+            }
+            return;
+        }
         friend ostream& operator<< (ostream& stream, const List& list){
             Node<T>* currentNode = list.head;
             stream << "[  ";
@@ -88,12 +165,30 @@ class List{
 
 
 int main(){     
-    List<Studente> list;
-    Studente studente = {"Patrick", "Nicolosi"};
+    List<Punto> list;
+    Punto punto = {12, 34};
+    Punto punto2 = {12, -3};
 
-    list.add(studente);
+    list.add(punto);
+    list.add(punto2);
 
-    cout << list << endl;
+    cout << "Stato iniziale--> " << list << endl;
+
+    list.remove(punto);
+
+    cout << "Dopo rimozione--> " << list << endl;
+
+    List<int> list2;
+
+    cout << "Cerco in list2: " << list2.search(345) << endl;
+
+    list2.addInOrder(4);
+    list2.addInOrder(1);
+    list2.addInOrder(10);
+    list2.addInOrder(345);
+
+    cout << "Cerco in list2: " << list2.search(345) << endl;
+    cout << list2 << endl;
     
     return 0;
 }
