@@ -32,27 +32,32 @@ class NodeDL{
 			return;
 		}
 		friend ostream& operator << (ostream& stream, const NodeDL& node){
-			stream << "prev = " << node->getPrev() << ", next = " << node->getNext() << ", value = " << node->getValue();
+			stream << "prev = " << node.getPrev() << ", next = " << node.getNext() << ", value = " << node.getValue();
 			return stream;
 		}
-		bool operator < (NodeDL& node){
-			if(node->getValue() < this->value) return true;
+		friend bool operator < (const NodeDL& node, const NodeDL& node1){
+			if(node.getValue() < node1.getValue()) return true;
 			return false;
 		}
-		bool operator <= (NodeDL& node){
-			if(node->getValue() <= this->value) return true;
+		friend bool operator <= (const NodeDL& node, const NodeDL& node1){
+			if(node.getValue() <= node1.getValue()) return true;
 			return false;
 		}
-		bool operator > (NodeDL& node){
-			if(node->getValue() > this->value) return true;
+		friend bool operator > (const NodeDL& node, const NodeDL& node1){
+			if(node.getValue() > node1.getValue()) return true;
 			return false;
 		}
-		bool operator >= (NodeDL& node){
-			if(node->getValue() >= this->value) return true;
+		friend bool operator >= (const NodeDL& node, const NodeDL& node1){
+			if(node.getValue() >= node1.getValue()) return true;
+			return false;
+		}
+		friend bool operator == (const NodeDL& node, const NodeDL& node1){
+			if(node.getValue() == node1.getValue()) return true;
 			return false;
 		}
 };
 
+/*
 template <class T>
 class ListDL{
 	NodeDL<T>* head;
@@ -74,11 +79,22 @@ class ListDL{
 			stream << "Stampo la lista";
 			return stream;
 		}
-};
+};*/
 
 
 int main(){
-	ListDL<int> list;
-	cout << list << endl;
+	/*ListDL<int> list;
+	cout << list << endl;*/
+	NodeDL<int> node(10);
+	NodeDL<int> node1(12);
+
+
+
+	cout << node << endl << node1 << endl;
+	cout << (node < node1) << endl;
+	cout << (node > node1) << endl;
+	cout << (node == node1) << endl;
+
+
 	return 0;
 }
