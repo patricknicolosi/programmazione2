@@ -60,11 +60,15 @@ template <class T>
 class List{
     Node<T>* head;
     int length;
+    bool isAscending = true;
     
     public:
-        List(){
-            this->head = NULL;
-            this->length = 0;
+        List(Node<T>* head, int length, bool isAscending) : head(head), length(length), isAscending(isAscending){}
+        List(bool isAscending) : List(NULL, 0, isAscending){}
+        List() : List(NULL, 0, true){}
+        void setAscending(bool isAscending){
+        	this->isAscending = isAscending;
+        	return;
         }
         void add(T value){            
             Node<T> * temp = new Node<T>(value);
@@ -90,33 +94,54 @@ class List{
 				add(newNode);
 				return;
 			}
-			if(head->getValue() > value){
-				newNode->setNext(head);
-				head = newNode;
-				length++;
-				return;
-			}
-			
-			Node<T> * prevNode = head;
-			Node<T>	* currentNode = head->getNext();
-
-			while(currentNode != NULL) {
-				if(prevNode->getValue() <= value && currentNode->getValue() > value) {
-					prevNode->setNext(newNode);
-					newNode->setNext(currentNode);
+			if(this->isAscending){
+				if(head->getValue() > value){
+					newNode->setNext(head);
+					head = newNode;
 					length++;
 					return;
 				}
+			}
+			else{
+				if(head->getValue() < value){
+					newNode->setNext(head);
+					head = newNode;
+					length++;
+					return;
+				}
+			}
+			Node<T> * prevNode = head;
+			Node<T>	* currentNode = head->getNext();
+			while(currentNode != NULL) {
+				if(this->isAscending){
+					if(prevNode->getValue() <= value && currentNode->getValue() > value) {
+						prevNode->setNext(newNode);
+						newNode->setNext(currentNode);
+						length++;
+						return;
+					}
+					else{
+						prevNode = currentNode; 
+						currentNode = currentNode->getNext();					
+					}
+				}
 				else {
-					prevNode = currentNode; 
-					currentNode = currentNode->getNext();
+					if(prevNode->getValue() > value && currentNode->getValue() <= value) {
+						prevNode->setNext(newNode);
+						newNode->setNext(currentNode);
+						length++;
+						return;
+					}
+					else{
+						prevNode = currentNode; 
+						currentNode = currentNode->getNext();					
+					}
 				}
 			}
 			prevNode->setNext(newNode);
 			length++;
 			return;
 		}
-
         bool search(T value){
             if(head == NULL) return false;
             Node<T>* currentNode = head;
@@ -129,24 +154,23 @@ class List{
             return false;
         }
         void remove(T value) {
-            if(this->search(value)){
-                if(head->getValue() == value) {
-                    Node<T> * temp = head;
-                    head = head->getNext();
-                    length--;
-                    return;
-                }   
-                Node<T> * prev = head;
-                Node<T> * currentNode = head->getNext();
-                while(currentNode != NULL){
-                    if(currentNode->getValue() == value){
-                        prev->setNext(currentNode->getNext());
-                        length--;
-                        return;
-                    }
-                    prev = currentNode;
-                    currentNode = currentNode->getNext();
-                }
+            if(this->search(value) == true){ // Se il valore è presente nella lista
+            	if(head->getValue() == value){
+            		head == head->getNext();
+            		length--;
+            		return;
+            	}
+                Node<T>* prevNode = head;
+                Node<T>* currentNode = head->getNext();
+				while(currentNode != NULL){
+					if(currentNode->getValue() == value){
+					    prevNode->setNext(currentNode->getNext());
+					    length--;
+					    return;
+					}
+					prevNode = currentNode; //faccio scorrere entrambi
+					currentNode = currentNode->getNext();
+				}
             }
             return;
         }
@@ -165,30 +189,15 @@ class List{
 
 
 int main(){     
-    List<Punto> list;
-    Punto punto = {12, 34};
-    Punto punto2 = {12, -3};
 
-    list.add(punto);
-    list.add(punto2);
+    List<int> list = (true);
+    list.setAscending(false);
+    list.addInOrder(4);
+    list.addInOrder(1);
+    list.addInOrder(10);
+    cout << list << endl;
+    list.remove(4);
+    cout << list << endl;
 
-    cout << "Stato iniziale--> " << list << endl;
-
-    list.remove(punto);
-
-    cout << "Dopo rimozione--> " << list << endl;
-
-    List<int> list2;
-
-    cout << "Cerco in list2: " << list2.search(345) << endl;
-
-    list2.addInOrder(4);
-    list2.addInOrder(1);
-    list2.addInOrder(10);
-    list2.addInOrder(345);
-
-    cout << "Cerco in list2: " << list2.search(345) << endl;
-    cout << list2 << endl;
-    
     return 0;
 }
